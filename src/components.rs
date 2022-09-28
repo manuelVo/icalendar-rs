@@ -145,6 +145,15 @@ pub trait Component {
         DatePerhapsTime::from_property(self.properties().get("RECURRENCE-ID")?)
     }
 
+    /// Gets the [`EXDATE`](https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.5.1) [`Property`]
+    fn get_exdates(&self) -> Vec<DatePerhapsTime> {
+        self.multi_properties()
+            .iter()
+            .filter(|prop| prop.key == "EXDATE")
+            .filter_map(|prop| DatePerhapsTime::from_property(prop))
+            .collect()
+    }
+
     /// Set the [`DTSTART`](https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.4) [`Property`]
     ///
     /// See [`DatePerhapsTime`] for info how are different [`chrono`] types converted automatically.
@@ -167,6 +176,14 @@ pub trait Component {
     fn recurrence_id<T: Into<DatePerhapsTime>>(&mut self, dt: T) -> &mut Self {
         let calendar_dt = dt.into();
         self.append_property(calendar_dt.to_property("RECURRENCE-ID"))
+    }
+
+    /// Add an [`EXDATE`](https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.5.1) [`Property`]
+    ///
+    /// See [`DatePerhapsTime`] for info how are different [`chrono`] types converted automatically.
+    fn exdate<T: Into<DatePerhapsTime>>(&mut self, dt: T) -> &mut Self {
+        let calendar_dt = dt.into();
+        self.append_multi_property(calendar_dt.to_property("EXDATE"))
     }
 
     /// Set the [`DTSTART`](https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.4) [`Property`]
